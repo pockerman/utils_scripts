@@ -195,9 +195,9 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
                         # calculate the distance
                         distance1 = calculator.normalized_distance(seq1, seq2)
                         distance2 = calculator.normalized_distance(seq1, reverse_complement_table(seq=seq2, tab=tab))
-                        distance3 = calculator.normalized_distance(seq2, reverse_complement_table(seq=seq1, tab=tab))
+                        #distance3 = calculator.normalized_distance(seq2, reverse_complement_table(seq=seq1, tab=tab))
 
-                        distance = min(distance1, distance2, distance3)
+                        distance = min(distance1, distance2)
                         lines.append([chr_seq_1, start1, end1, seq1, state1, chr_seq_2, start2, end2, seq2, state2, distance])
 
                         # if we reached the batch then flush
