@@ -298,7 +298,7 @@ def main():
         procs[p].start()
         start = (p+1)*load
 
-    print("{0} Master Process {1} works in [{2},{3})".format(INFO, p, start, -1))
+    print("{0} Master Process {1} works in [{2},{3})".format(INFO, MASTER_PROC_ID, start, -1))
 
     # main process is working as well
     write_pair_segments_distances(proc_id=MASTER_PROC_ID, master_proc=MASTER_PROC_ID,
