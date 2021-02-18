@@ -1,0 +1,9 @@
+{
+  "distance_type": "ham",
+  "input_file": "/home/alex/qi3/hmmtuf/computations/distances/nucl_out.bed",
+  "output_file": "/home/alex/qi3/hmmtuf/computations/distances/ham/",
+  "line_counter": 10000,
+  "num_procs": 5,
+  "master_proc_id": 4,
+  "load": 140
+}
