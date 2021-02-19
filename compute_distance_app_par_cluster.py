@@ -298,8 +298,8 @@ def main():
                                       line_counter, outdir,
                                       distance_type, err_map)))
         procs[p].start()
-        start = (p+1)*load
-        end = start + load
+        start = end
+        end = end + load
 
     print("{0} Master Process {1} works in [{2},{3})".format(INFO, MASTER_PROC_ID, start, end))
 
