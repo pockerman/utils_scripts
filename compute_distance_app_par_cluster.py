@@ -287,7 +287,7 @@ def main():
 
     procs = []
 
-    start = 0
+    start = configuration["start"]
     end = start + load
     for p in range(num_procs-1):
         print("{0} Process {1} works in [{2},{3})".format(INFO, p, start, end))
