@@ -198,7 +198,8 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
                         #distance3 = calculator.normalized_distance(seq2, reverse_complement_table(seq=seq1, tab=tab))
 
                         distance = min(distance1, distance2)
-                        lines.append([chr_seq_1, start1, end1, seq1, state1, chr_seq_2, start2, end2, seq2, state2, distance])
+                        lines.append([chr_seq_1, start1, end1, seq1, state1,
+                                      chr_seq_2, start2, end2, seq2, state2, distance])
 
                         # if we reached the batch then flush
                         # to the output file
@@ -287,8 +288,9 @@ def main():
     procs = []
 
     start = 0
+    end = start + load
     for p in range(num_procs-1):
-        print("{0} Process {1} works in [{2},{3})".format(INFO, p, start, (p+1)*load))
+        print("{0} Process {1} works in [{2},{3})".format(INFO, p, start, end))
         procs.append(mp.Process(target=write_pair_segments_distances,
                                 group=None,
                                 args=(p, MASTER_PROC_ID,
@@ -297,12 +299,14 @@ def main():
                                       distance_type, err_map)))
         procs[p].start()
         start = (p+1)*load
+        end = start + load
 
-    print("{0} Master Process {1} works in [{2},{3})".format(INFO, MASTER_PROC_ID, start, -1))
+    print("{0} Master Process {1} works in [{2},{3})".format(INFO, MASTER_PROC_ID, start, end))
 
     # main process is working as well
-    write_pair_segments_distances(proc_id=MASTER_PROC_ID, master_proc=MASTER_PROC_ID,
-                                  start=start, end=-1,
+    write_pair_segments_distances(proc_id=MASTER_PROC_ID,
+                                  master_proc=MASTER_PROC_ID,
+                                  start=start, end=end,
                                   input_file=input_file,
                                   line_counter=line_counter,
                                   outdir=outdir,
