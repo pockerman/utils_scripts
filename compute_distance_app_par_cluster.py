@@ -294,7 +294,7 @@ def main():
         procs.append(mp.Process(target=write_pair_segments_distances,
                                 group=None,
                                 args=(p, MASTER_PROC_ID,
-                                      start, (p+1)*load, input_file,
+                                      start, end, input_file,
                                       line_counter, outdir,
                                       distance_type, err_map)))
         procs[p].start()
