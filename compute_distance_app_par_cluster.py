@@ -174,11 +174,10 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
         touched = []
         lines = []
 
-
         # only work on the part assigned [start, end)
         for i in range(start, end, 1):
             for j in range(len(sequences)):
-                if (i, j) not in touched and (j, i) not in touched:
+                if j >= start and (i, j) not in touched and (j, i) not in touched:
 
                     chr_seq_1 = sequences[i][0].strip()
                     start1 = sequences[i][1]
