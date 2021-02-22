@@ -162,6 +162,9 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
         if start >= end:
             raise ValueError("Error: start index={0} greater than end index={1}".format(start, end))
 
+        if proc_id == master_proc:
+            print("{0} Master process is working on [{1}, {2})".format(INFO, start, end))
+
         tab = str.maketrans("ACTGRMW", "TGACYKS")
 
         # build the wrapper
