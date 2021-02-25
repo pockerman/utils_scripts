@@ -113,7 +113,7 @@ class TextDistanceCalculator(object):
     def __init__(self, dist_type):
 
         if dist_type not in TextDistanceCalculator.NAMES:
-            raise Error("Distance type '{0}' is invalid".format(dist_type))
+            raise ValueError("Distance type '{0}' is invalid".format(dist_type))
 
         self._dist_type = dist_type
 
@@ -144,6 +144,7 @@ def read_json(filename):
 def reverse_complement_table(seq, tab):
     return seq.translate(tab)[::-1]
 
+
 def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
                                   line_counter, outdir, distance_type, error_map):
 
@@ -166,6 +167,9 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
             print("{0} Master process is working on [{1}, {2})".format(INFO, start, end))
 
         tab = str.maketrans("ACTGRMW", "TGACYKS")
+        tabPP = str.maketrans("AGCT", "RRYY")
+        tabAK = str.maketrans("ACGT", "MMKK")
+        tabWS = str.maketrans("ATCG", "WWSS")
 
         # build the wrapper
         calculator = TextDistanceCalculator.build_calculator(name=distance_type)
@@ -196,12 +200,40 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
 
                         # calculate the distance
                         distance1 = calculator.normalized_distance(seq1, seq2)
-                        distance2 = calculator.normalized_distance(seq1, reverse_complement_table(seq=seq2, tab=tab))
-                        #distance3 = calculator.normalized_distance(seq2, reverse_complement_table(seq=seq1, tab=tab))
+                        distance2 = calculator.normalized_distance(seq1,
+                                                                   reverse_complement_table(seq=seq2, tab=tab))
 
                         distance = min(distance1, distance2)
+
+                        PPseq1 = seq1.translate(tabPP)
+                        AKseq1 = seq1.translate(tabAK)
+                        WSseq1 = seq1.translate(tabWS)
+
+                        PPseq2 = seq2.translate(tabPP)
+                        AKseq2 = seq2.translate(tabAK)
+                        WSseq2 = seq2.translate(tabWS)
+
+                        PPdist = calculator.normalized_distance(PPseq1, PPseq2)
+                        PPdist_rev = calculator.normalized_distance(PPseq1,
+                                                                    reverse_complement_table(seq=PPseq2, tab=tab))
+
+                        pp_distance = min(PPdist, PPdist_rev)
+
+                        AKdist = calculator.normalized_distance(AKseq1, AKseq2)
+                        AKdist_rev = calculator.normalized_distance(AKseq1,
+                                                                    reverse_complement_table(seq=AKseq2, tab=tab))
+
+                        ak_distance = min(AKdist, AKdist_rev)
+
+                        WSdist = calculator.normalized_distance(WSseq1, WSseq2)
+                        WSdist_rev = calculator.normalized_distance(WSseq1,
+                                                                    reverse_complement_table(seq=WSseq2, tab=tab))
+
+                        ws_distance = min(WSdist, WSdist_rev)
+
                         lines.append([chr_seq_1, start1, end1, seq1, state1,
-                                      chr_seq_2, start2, end2, seq2, state2, distance])
+                                      chr_seq_2, start2, end2, seq2, state2,
+                                      distance, pp_distance, ak_distance, ws_distance])
 
                         # if we reached the batch then flush
                         # to the output file
@@ -217,8 +249,12 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
 
                             with open(filename, 'w', newline="\n") as fh:
                                 writer = csv.writer(fh, delimiter=",")
-                                for l in lines:
-                                    writer.writerow(l)
+                                writer.writerow(["#", "ChrSeq-1", "StartSeq-1", "EndSeq-1", "Seq-1", "HMM-State-1",
+                                                 "ChrSeq-2", "StartSeq-2", "EndSeq-2", "Seq-2", "HMM-State-2",
+                                                 "Distance", "Distance-PP", "Distance-AK", "Distance-WS"])
+
+                                for line in lines:
+                                    writer.writerow(line)
 
                             if proc_id == master_proc:
                                 print("{0} Finished writing to {1}".format(INFO, filename))
@@ -248,13 +284,17 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
 
             with open(filename, 'w', newline="\n") as fh:
                 writer = csv.writer(fh, delimiter=",")
-                for l in lines:
-                    writer.writerow(l)
+                writer.writerow(["#", "ChrSeq-1", "StartSeq-1", "EndSeq-1", "Seq-1", "HMM-State-1",
+                                 "ChrSeq-2", "StartSeq-2", "EndSeq-2", "Seq-2", "HMM-State-2",
+                                 "Distance", "Distance-PP", "Distance-AK", "Distance-WS"])
+
+                for line in lines:
+                    writer.writerow(line)
 
             if proc_id == master_proc:
                 print("{0} Finished writing remaining lines to {1}".format(INFO, filename))
 
-            lines = []
+            #lines = []
             part_counter += 1
 
         error_map[proc_id] = "FINISHED SUCCESS"
