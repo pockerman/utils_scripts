@@ -345,6 +345,9 @@ def main():
 
     print("{0} Master Process {1} works in [{2},{3})".format(INFO, MASTER_PROC_ID, start, end))
 
+    if "end" in  configuration and configuration["end"] is not None:
+        end = configuration["end"]
+
     # main process is working as well
     write_pair_segments_distances(proc_id=MASTER_PROC_ID,
                                   master_proc=MASTER_PROC_ID,
