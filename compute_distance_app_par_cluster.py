@@ -7,6 +7,7 @@ import textdistance
 
 INFO = "INFO: "
 
+
 class NuclOutFileReader(object):
 
     def __init__(self, exclude_seqs=["NO_REPEATS"], delimiter: str='\t') -> None:
@@ -34,13 +35,14 @@ class NuclOutFileReader(object):
 
             return seqs
 
+
 class TextDistanceCalculator(object):
     """
     Wrapper class for text distance calculation
     """
 
     NAMES = ['ham', 'mlipns', 'lev', 'damlev', 'jwink', 'str',
-             'nw', 'got', 'jac', 'sor', 'tve', 'ov', 'tan',
+             'nw', 'sw', 'got', 'jac', 'sor', 'tve', 'ov', 'tan',
              'cos', 'mon', 'bag', 'lcsseq', 'lcsstr', 'rat',
              'ari', 'rle', 'bwt', 'sqr', 'ent', 'bz2', 'lzm',
              'zli', 'mra', 'edi', 'pre', 'pos',
@@ -59,6 +61,7 @@ class TextDistanceCalculator(object):
         elif name == 'jwink' : return textdistance.JaroWinkler()
         elif name == 'str'   : return textdistance.StrCmp95()
         elif name == 'nw'    : return textdistance.NeedlemanWunsch()
+        elif name == 'sw'    : return textdistance.SmithWaterman()
         elif name == 'got'   : return textdistance.Gotoh()
         elif name == 'jac'   : return textdistance.Jaccard()
         elif name == 'sor'   : return textdistance.Sorensen()
@@ -301,6 +304,7 @@ def write_pair_segments_distances(proc_id, master_proc, start, end, input_file,
     except Exception as e:
         error_map[proc_id] = str(e)
 
+
 def main():
 
     print("{0} Starting...".format(INFO))
@@ -345,7 +349,7 @@ def main():
 
     print("{0} Master Process {1} works in [{2},{3})".format(INFO, MASTER_PROC_ID, start, end))
 
-    if "end" in  configuration and configuration["end"] is not None:
+    if "end" in configuration and configuration["end"] is not None:
         end = configuration["end"]
 
     # main process is working as well
@@ -361,7 +365,6 @@ def main():
     for p in procs:
         p.join()
 
-
     for i in range(num_procs):
 
         if err_map[i] != "FINISHED SUCCESS":
@@ -369,6 +372,7 @@ def main():
         else:
             print("{0} Process {1} finished with success".format(INFO, i))
     print("{0} Finished...".format(INFO))
+
 
 if __name__ == '__main__':
     main()
